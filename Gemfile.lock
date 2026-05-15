@@ -390,6 +390,7 @@ DEPENDENCIES
   debug
   devise
   importmap-rails
+  matrix
   pg (~> 1.1)
   prawn
   prawn-table

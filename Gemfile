@@ -64,3 +64,4 @@ gem "prawn"
 gem "prawn-table"
 gem "sidekiq", "~> 8.1"
 gem "redis"
+gem 'matrix'
