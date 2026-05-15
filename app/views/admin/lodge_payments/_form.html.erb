@@ -1,0 +1,209 @@
+<% modal_id = lodge_payment.persisted? ? "edit-lodge-payment-#{lodge_payment.id}" : "lodge-payment-modal" %>
+
+<% display_net_total =
+     if lodge_payment.persisted? && lodge_payment.frequency == "Monthly"
+       lodge_payment.net_total.to_d / 1.15
+     else
+       lodge_payment.net_total
+     end
+%>
+
+<% standard_vat_values = [5.to_d, 10.to_d, 20.to_d] %>
+
+<% vat_value =
+     if lodge_payment.vat.present? && standard_vat_values.include?(lodge_payment.vat.to_d)
+       lodge_payment.vat.to_i.to_s
+     elsif lodge_payment.vat.present?
+       "custom"
+     else
+       ""
+     end
+%>
+
+<% custom_vat_value = vat_value == "custom" ? lodge_payment.vat : nil %>
+
+<div
+  id="<%= modal_id %>"
+  data-modal
+  class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center"
+>
+  <div class="bg-white rounded-lg w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-[#17261f]">
+        <%= lodge_payment.persisted? ? "Edit Lodge Payment" : "Add Lodge Payment" %>
+      </h2>
+
+      <button
+        type="button"
+        data-action="click->modal#close"
+        class="text-[#17261f80] hover:text-[#17261f]"
+      >
+        ✕
+      </button>
+    </div>
+
+    <%= form_with model: [:admin, lodge_payment],
+                  class: "space-y-4",
+                  data: {
+                    controller: "vat",
+                    turbo: false
+                  } do |form| %>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <%= form.label :pitch_id, "Pitch", class: "block text-sm mb-1" %>
+
+          <%= form.select :pitch_id,
+                          @pitches.map { |pitch|
+                            [
+                              "#{pitch.park.name} - #{pitch.pitch_number} - #{pitch.user.full_name}",
+                              pitch.id
+                            ]
+                          },
+                          { prompt: "Select Pitch" },
+                          class: "w-full rounded border px-3 py-2"
+          %>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="w-1/2">
+            <%= form.label :net_total, "Amount (£)", class: "block text-sm mb-1" %>
+
+            <%= form.number_field :net_total,
+                                  value: display_net_total,
+                                  step: "0.01",
+                                  class: "w-full rounded border px-3 py-2",
+                                  data: {
+                                    vat_target: "amount",
+                                    action: "input->vat#calculate"
+                                  }
+            %>
+          </div>
+
+          <div class="w-1/2">
+            <%= form.label :frequency, class: "block text-sm mb-1" %>
+
+            <%= form.select :frequency,
+                            ["Monthly", "Annually"],
+                            {},
+                            class: "w-full rounded border px-3 py-2",
+                            data: {
+                              vat_target: "frequency",
+                              action: "change->vat#calculate"
+                            }
+            %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :year, class: "block text-sm mb-1" %>
+
+          <%= form.number_field :year,
+                                value: lodge_payment.year || Date.current.year,
+                                class: "w-full rounded border px-3 py-2"
+          %>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="w-1/2">
+            <%= label_tag :vat_select, "VAT", class: "block text-sm mb-1" %>
+
+            <%= select_tag :vat_select,
+                           options_for_select(
+                             [
+                               ["Select VAT", ""],
+                               ["5%", "5"],
+                               ["10%", "10"],
+                               ["20%", "20"],
+                               ["Custom", "custom"]
+                             ],
+                             vat_value
+                           ),
+                           class: "w-full rounded border px-3 py-2",
+                           data: {
+                             vat_target: "select",
+                             action: "change->vat#toggle"
+                           }
+            %>
+          </div>
+
+          <div
+            class="w-1/2 <%= vat_value == 'custom' ? '' : 'hidden' %>"
+            data-vat-target="customContainer"
+          >
+            <%= label_tag :custom_vat, "Custom VAT %", class: "block text-sm mb-1" %>
+
+            <%= number_field_tag :custom_vat,
+                                 custom_vat_value,
+                                 min: 0,
+                                 max: 100,
+                                 step: 0.01,
+                                 placeholder: "0-100",
+                                 class: "w-full rounded border px-3 py-2",
+                                 disabled: vat_value != "custom",
+                                 data: {
+                                   vat_target: "custom",
+                                   action: "input->vat#calculate"
+                                 }
+            %>
+          </div>
+        </div>
+      </div>
+
+      <div class="border p-3 rounded flex flex-col gap-1">
+        <div class="flex justify-between">
+          <p class="text-sm text-[#17261f80]">Net</p>
+          <p class="text-sm font-medium text-[#17261f]" data-vat-target="net">
+            £0.00
+          </p>
+        </div>
+
+        <div class="flex justify-between">
+          <p class="text-sm text-[#17261f80]" data-vat-target="vatLabel">
+            Vat (0%)
+          </p>
+
+          <p class="text-sm font-medium text-[#17261f]" data-vat-target="vatTotal">
+            £0.00
+          </p>
+        </div>
+
+        <div
+          class="flex justify-between hidden"
+          data-vat-target="monthlySurchargeRow"
+        >
+          <p class="text-sm text-[#17261f80]">Monthly surcharge (15%)</p>
+
+          <p
+            class="text-sm font-medium text-[#17261f]"
+            data-vat-target="monthlySurcharge"
+          >
+            £0.00
+          </p>
+        </div>
+
+        <div class="border-t pt-2 mt-2 flex justify-between">
+          <p class="text-sm font-semibold text-[#17261f]">Total</p>
+
+          <p class="text-sm font-semibold text-[#17261f]" data-vat-target="total">
+            £0.00
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4">
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="px-4 py-2 rounded border"
+        >
+          Cancel
+        </button>
+
+        <%= form.submit lodge_payment.persisted? ? "Update Lodge Payment" : "Add Lodge Payment",
+                        class: "bg-[#ffc029] text-[#181818] px-4 py-2 rounded hover:bg-[#ffc029] transition"
+        %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,2 @@
+module Admin::PitchesHelper
+end

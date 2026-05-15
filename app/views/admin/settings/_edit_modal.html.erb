@@ -1,0 +1,29 @@
+<div
+  id="edit-utility-rate-<%= rate.id %>"
+  data-modal
+  class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+>
+  <div class="absolute inset-0" data-action="click->modal#close"></div>
+
+  <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+    <div class="flex justify-between items-start mb-3">
+      <h2 class="text-xl font-semibold text-[#17261f]">
+        Edit Utility Rate
+      </h2>
+
+      <button
+        type="button"
+        data-action="click->modal#close"
+        class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+      >
+        <span class="text-[#17261f80] text-lg leading-none">×</span>
+      </button>
+    </div>
+
+    <%= render "admin/settings/form",
+               utility_rate: rate,
+               url: utility_rate_admin_settings_path(rate),
+               method: :patch,
+               submit_text: "Update Rate" %>
+  </div>
+</div>

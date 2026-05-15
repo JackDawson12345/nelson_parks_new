@@ -1,0 +1,81 @@
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Settings
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        Company and system preferences
+      </p>
+    </div>
+  </div>
+
+  <div class="flex gap-4">
+
+    <div class="w-full bg-white shadow-sm flex flex-col gap-4 border rounded-lg p-6">
+      <h3 class="text-xl font-semibold text-[#17261f]">
+        Utility rates by park
+      </h3>
+
+      <%= render "admin/settings/form", utility_rate: @utility_rate, url: admin_settings_path, method: :post, submit_text: "Create Rate" %>
+
+      <table class="w-full text-sm mt-4 border">
+        <thead>
+        <tr class="border-b bg-gray-50 text-left">
+          <th class="p-2">Park</th>
+          <th class="p-2">Utility</th>
+          <th class="p-2">Unit Rate</th>
+          <th class="p-2">Standing</th>
+          <th class="p-2">From</th>
+          <th class="p-2">To</th>
+          <th class="p-2 text-right">Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <% @utility_rates.each do |rate| %>
+          <tr class="border-b">
+            <td class="p-2"><%= rate.park.name %></td>
+            <td class="p-2"><%= rate.utility.titleize %></td>
+            <td class="p-2">£<%= rate.unit_rate %></td>
+            <td class="p-2">£<%= rate.standing_rate %></td>
+            <td class="p-2">
+              <%= rate.from_date&.strftime("%d/%m/%Y") || "-" %>
+            </td>
+
+            <td class="p-2">
+              <%= rate.to_date&.strftime("%d/%m/%Y") || "-" %>
+            </td>
+
+            <td class="p-2">
+              <div class="flex justify-end items-center">
+                <button
+                  type="button"
+                  data-action="click->modal#open"
+                  data-modal-id="edit-utility-rate-<%= rate.id %>"
+                  class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#f5f5f5]"
+                >
+                  <%= render "icons/edit", size: "16px", colour: "#63746b" %>
+                </button>
+
+                <button
+                  type="button"
+                  data-action="click->modal#open"
+                  data-modal-id="delete-utility-rate-<%= rate.id %>"
+                  class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+                >
+                  <%= render "icons/bin", size: "16px", colour: "#db2424" %>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <%= render "admin/settings/edit_modal", rate: rate %>
+          <%= render "admin/settings/delete_modal", rate: rate %>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

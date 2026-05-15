@@ -1,0 +1,26 @@
+<%= form_with model: [:admin, park], class: "space-y-4" do |form| %>
+  <div>
+    <%= form.label :name, class: "block text-sm font-medium text-[#17261f]" %>
+    <%= form.text_field :name,
+                        class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                        placeholder: "Oakwood Meadows" %>
+  </div>
+
+  <div>
+    <%= form.label :location, class: "block text-sm font-medium text-[#17261f]" %>
+    <%= form.text_field :location,
+                        class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                        placeholder: "Devon" %>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-4">
+    <button type="button"
+            data-action="click->modal#close"
+            class="rounded border px-4 py-2 text-sm">
+      Cancel
+    </button>
+
+    <%= form.submit park.persisted? ? "Update Park" : "Create Park",
+                    class: "bg-[#ffb400] text-[#181818] py-2 px-4 rounded text-sm font-medium hover:bg-[#ffc029]" %>
+  </div>
+<% end %>

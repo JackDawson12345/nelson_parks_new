@@ -1,0 +1,206 @@
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Parks
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        Manage holiday park locations
+      </p>
+    </div>
+
+    <button
+      type="button"
+      data-action="click->modal#open"
+      data-modal-id="create-park"
+      class="bg-[#ffb400] py-2 px-4 rounded flex gap-2 items-center hover:bg-[#ffc029] transition"
+    >
+      <%= render 'icons/plus', size: '16px', colour: '#181818' %>
+
+      <p class="text-[#181818] text-sm font-medium">
+        Add Park
+      </p>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <% @parks.each do |park| %>
+      <div class="bg-white shadow-sm p-5 flex flex-col gap-4 border rounded-lg hover:border-[#173025] transition duration-500 ease-in-out">
+        <div class="flex justify-between">
+          <div class="w-12 h-12 flex justify-center items-center bg-gradient-to-br from-[#ffb400] to-[hsl(152_55%_22%/0)] rounded">
+            <%= render 'icons/pitches', size: '24px', colour: '#181818' %>
+          </div>
+
+          <div class="flex">
+            <button
+              type="button"
+              data-action="click->modal#open"
+              data-modal-id="edit-park-<%= park.id %>"
+              class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#f5f5f5]"
+            >
+              <%= render 'icons/edit', size: '16px', colour: '#63746b' %>
+            </button>
+
+            <button
+              type="button"
+              data-action="click->modal#open"
+              data-modal-id="delete-park-<%= park.id %>"
+              class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+            >
+              <%= render 'icons/bin', size: '16px', colour: '#db2424' %>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-2xl/[32px] text-[#17261f]">
+            <%= park.name %>
+          </h3>
+
+          <p class="text-xs mt-1 text-[#17261f80]">
+            <%= park.location %>
+          </p>
+        </div>
+
+        <div class="pt-4 border-t flex">
+          <% pitches = Pitch.where(park_id: park.id) %>
+          <div class="w-1/2">
+            <p class="text-xs mt-1 text-[#17261f80]">
+              Pitches
+            </p>
+
+            <h3 class="font-semibold text-[#17261f]">
+              <%= pitches.count %>
+            </h3>
+          </div>
+
+          <% total = pitches.count%>
+          <% occupied = pitches.where(status: "Occupied").count%>
+          <% percentage = total.zero? ? 0 : (occupied.to_f / total * 100).round(0) %>
+          <div class="w-1/2">
+            <p class="text-xs mt-1 text-[#17261f80]">
+              Occupancy
+            </p>
+
+            <h3 class="font-semibold text-[#17261f]">
+              <%= percentage %>%
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Modal -->
+      <div
+        id="edit-park-<%= park.id %>"
+        data-modal
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+      >
+        <div
+          class="absolute inset-0"
+          data-action="click->modal#close"
+        ></div>
+
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h2 class="text-xl font-semibold text-[#17261f]">
+                Edit Park
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              data-action="click->modal#close"
+              class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+            >
+              <span class="text-[#17261f80] text-lg leading-none">
+                ×
+              </span>
+            </button>
+          </div>
+
+          <%= render "admin/parks/form", park: park %>
+        </div>
+      </div>
+
+      <!-- Delete Modal -->
+      <div
+        id="delete-park-<%= park.id %>"
+        data-modal
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+      >
+        <div
+          class="absolute inset-0"
+          data-action="click->modal#close"
+        ></div>
+
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold text-[#17261f]">
+              Delete Park
+            </h2>
+
+            <p class="text-sm text-[#17261f80] mt-2">
+              Are you sure you want to delete
+              <span class="font-semibold text-[#17261f]">
+                <%= park.name %>
+              </span>?
+              This action cannot be undone.
+            </p>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              data-action="click->modal#close"
+              class="rounded border px-4 py-2 text-sm"
+            >
+              Cancel
+            </button>
+
+            <%= button_to "Delete",
+                          admin_park_path(park),
+                          method: :delete,
+                          data: { turbo: false },
+                          class: "bg-[#db2424] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#b91c1c]" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Create Modal -->
+  <div
+    id="create-park"
+    data-modal
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+  >
+    <div
+      class="absolute inset-0"
+      data-action="click->modal#close"
+    ></div>
+
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h2 class="text-xl font-semibold text-[#17261f]">
+            New Park
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+        >
+          <span class="text-[#17261f80] text-lg leading-none">
+            ×
+          </span>
+        </button>
+      </div>
+
+      <%= render "admin/parks/form", park: @park %>
+    </div>
+  </div>
+</div>

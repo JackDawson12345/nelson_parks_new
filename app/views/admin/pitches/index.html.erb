@@ -1,0 +1,223 @@
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Pitches
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        All pitches across parks, linked to clients
+      </p>
+    </div>
+
+    <button
+      type="button"
+      data-action="click->modal#open"
+      data-modal-id="create-pitch"
+      class="bg-[#ffb400] py-2 px-4 rounded flex gap-2 hover:bg-[#ffc029] items-center"
+    >
+      <%= render 'icons/plus', size: '16px', colour: '#181818' %>
+
+      <p class="text-[#181818] text-sm font-medium">
+        Add Pitch
+      </p>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg overflow-hidden border">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-white">
+      <tr>
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Pitch No.
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Park
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Type
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Client
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Status
+        </th>
+
+        <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">
+          Actions
+        </th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y divide-gray-200 bg-white">
+      <% @pitches.each do |pitch| %>
+        <tr>
+          <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+            <%= pitch.pitch_number %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= pitch.park&.name %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= pitch.pitch_type %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= pitch.user&.full_name %>
+          </td>
+
+          <td class="px-4 py-3">
+              <span class="rounded-full bg-[#ffb400] px-3 py-1 text-xs font-medium text-[#181818]">
+                <%= pitch.status %>
+              </span>
+          </td>
+
+          <td class="px-4 py-3 text-sm">
+            <div class="flex justify-end items-center">
+              <button
+                type="button"
+                data-action="click->modal#open"
+                data-modal-id="edit-pitch-<%= pitch.id %>"
+                class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#f5f5f5]"
+              >
+                <%= render 'icons/edit', size: '16px', colour: '#63746b' %>
+              </button>
+
+              <button
+                type="button"
+                data-action="click->modal#open"
+                data-modal-id="delete-pitch-<%= pitch.id %>"
+                class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+              >
+                <%= render 'icons/bin', size: '16px', colour: '#db2424' %>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Edit Modal -->
+        <div
+          id="edit-pitch-<%= pitch.id %>"
+          data-modal
+          class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+        >
+          <div
+            class="absolute inset-0"
+            data-action="click->modal#close"
+          ></div>
+
+          <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <h2 class="text-xl font-semibold text-[#17261f]">
+                  Edit Pitch
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                data-action="click->modal#close"
+                class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+              >
+                  <span class="text-[#17261f80] text-lg leading-none">
+                    ×
+                  </span>
+              </button>
+            </div>
+
+            <%= render "admin/pitches/form", pitch: pitch %>
+          </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div
+          id="delete-pitch-<%= pitch.id %>"
+          data-modal
+          class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+        >
+          <div
+            class="absolute inset-0"
+            data-action="click->modal#close"
+          ></div>
+
+          <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div class="mb-6">
+              <h2 class="text-xl font-semibold text-[#17261f]">
+                Delete Pitch
+              </h2>
+
+              <p class="text-sm text-[#17261f80] mt-2">
+                Are you sure you want to delete
+                <span class="font-semibold text-[#17261f]">
+                  <%= pitch.pitch_number %>
+                </span>?
+              </p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                data-action="click->modal#close"
+                class="rounded border px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+
+              <%= button_to "Delete",
+                            admin_pitch_path(pitch),
+                            method: :delete,
+                            data: { turbo: false },
+                            class: "bg-[#db2424] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#b91c1c]" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pt-4">
+    <%= will_paginate @pitches %>
+  </div>
+
+  <!-- Create Modal -->
+  <div
+    id="create-pitch"
+    data-modal
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+  >
+    <div
+      class="absolute inset-0"
+      data-action="click->modal#close"
+    ></div>
+
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h2 class="text-xl font-semibold text-[#17261f]">
+            New Pitch
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+        >
+          <span class="text-[#17261f80] text-lg leading-none">
+            ×
+          </span>
+        </button>
+      </div>
+
+      <%= render "admin/pitches/form", pitch: @pitch %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+<%= form_with model: client,
+              url: client.persisted? ? admin_client_path(client) : admin_clients_path,
+              class: "space-y-4" do |form| %>
+  <% if client.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h3 class="text-sm font-semibold text-red-700 mb-2">
+        Please fix the following:
+      </h3>
+
+      <ul class="text-sm text-red-600 list-disc pl-5 space-y-1">
+        <% client.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :full_name, class: "block text-sm font-medium text-[#17261f]" %>
+    <%= form.text_field :full_name,
+                        required: true,
+                        class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                        placeholder: "James Whitfield" %>
+  </div>
+
+  <div class="flex gap-2">
+    <div class="w-1/2">
+      <%= form.label :email, class: "block text-sm font-medium text-[#17261f]" %>
+      <%= form.email_field :email,
+                           required: true,
+                           class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                           placeholder: "j.whitfield@mail.com" %>
+    </div>
+
+    <div class="w-1/2">
+      <%= form.label :phone_number, class: "block text-sm font-medium text-[#17261f]" %>
+      <%= form.telephone_field :phone_number,
+                               class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                               placeholder: "07700 900123" %>
+    </div>
+  </div>
+
+  <div class="flex gap-2">
+    <div class="w-full">
+      <%= form.label :xero_id, class: "block text-sm font-medium text-[#17261f]" %>
+      <%= form.text_field :xero_id,
+                           required: true,
+                           class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                           placeholder: "5ee491f4-9c30-4e4d-b8ed-17e4b9718061" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :pitch_id, "Assigned Pitch", class: "block text-sm font-medium text-[#17261f]" %>
+
+    <%= form.collection_select :pitch_id,
+                               Pitch.includes(:park).where(user_id: [nil, client.id]),
+                               :id,
+                               ->(pitch) { "#{pitch.pitch_number} - #{pitch.park&.name}" },
+                               { prompt: "No pitch assigned", selected: client.pitch&.id },
+                               { class: "mt-1 w-full rounded border px-3 py-2 text-sm" } %>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-4">
+    <button type="button"
+            data-action="click->modal#close"
+            class="rounded border px-4 py-2 text-sm hover:bg-[#f8f8f8]">
+      Cancel
+    </button>
+
+    <%= form.submit client.persisted? ? "Update Client" : "Create Client",
+                    class: "bg-[#ffb400] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#ffc029]" %>
+  </div>
+<% end %>

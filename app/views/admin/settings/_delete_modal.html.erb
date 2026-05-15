@@ -1,0 +1,42 @@
+<div
+  id="delete-utility-rate-<%= rate.id %>"
+  data-modal
+  class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+>
+  <div class="absolute inset-0" data-action="click->modal#close"></div>
+
+  <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-[#17261f]">
+        Delete Utility Rate
+      </h2>
+
+      <p class="text-sm text-[#17261f80] mt-2">
+        Are you sure you want to delete the
+        <span class="font-semibold text-[#17261f]">
+          <%= rate.utility.titleize %>
+        </span>
+        rate for
+        <span class="font-semibold text-[#17261f]">
+          <%= rate.park.name %>
+        </span>?
+      </p>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <button
+        type="button"
+        data-action="click->modal#close"
+        class="rounded border px-4 py-2 text-sm"
+      >
+        Cancel
+      </button>
+
+      <%= button_to "Delete",
+                    utility_rate_admin_settings_path(rate),
+                    method: :delete,
+                    data: { turbo: false },
+                    class: "bg-[#db2424] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#b91c1c]" %>
+    </div>
+  </div>
+</div>

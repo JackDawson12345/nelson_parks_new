@@ -1,0 +1,102 @@
+<div class="mb-6 flex justify-between items-center">
+  <div>
+    <h1 class="text-2xl font-semibold text-[#17261f]">
+      Gas Invoices
+    </h1>
+
+    <p class="text-sm/[20px] text-[#17261f80]">
+      View and track all invoices being added
+    </p>
+  </div>
+
+</div>
+
+<div class="bg-white rounded-lg overflow-hidden border">
+  <% if @invoices.any? %>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-white">
+      <tr>
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Invoice ID
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          User
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Pitch
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Reference
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Due Date
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Total
+        </th>
+
+        <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">
+          Actions
+        </th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y divide-gray-200 bg-white">
+      <% @invoices.each do |invoice| %>
+        <tr>
+          <td class="px-4 py-3 text-sm text-gray-700">
+            INV-<%= invoice.id %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= invoice.user.full_name %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+            <%= invoice.pitch.pitch_number %> <%= invoice.pitch.park.name %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= invoice.reference_type %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= invoice.due_date %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            £<%= invoice.total %>
+          </td>
+
+          <td class="px-4 py-3 text-sm">
+            <div class="flex justify-end">
+              <%= link_to manage_invoices_show_path(invoice) do %>
+                <%= eye_icon %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="py-16 px-6 text-center">
+      <p class="text-sm font-medium text-[#17261f]">
+        No invoices found
+      </p>
+
+      <p class="mt-1 text-sm text-[#17261f80]">
+        There are currently no gas invoices to display.
+      </p>
+    </div>
+  <% end %>
+</div>
+
+<div>
+  <%= will_paginate @invoices %>
+</div>

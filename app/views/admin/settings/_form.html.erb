@@ -1,0 +1,58 @@
+<%= form_with model: utility_rate,
+              url: url,
+              method: method,
+              class: "space-y-4" do |form| %>
+
+  <div class="flex gap-4 flex-wrap">
+    <div>
+      <%= form.label :park_id, "Park", class: "text-xs font-semibold" %><br />
+      <%= form.collection_select :park_id,
+                                 @parks,
+                                 :id,
+                                 :name,
+                                 {},
+                                 class: "w-40 h-10 rounded border px-2 py-1 text-sm" %>
+    </div>
+
+    <div>
+      <%= form.label :utility, "Utility", class: "text-xs font-semibold" %><br />
+      <%= form.select :utility,
+                      [["Electric", "electric"], ["Gas", "gas"]],
+                      {},
+                      class: "w-28 h-10 rounded border px-2 py-1 text-sm" %>
+    </div>
+
+    <div>
+      <%= form.label :unit_rate, "Unit Rate (£)", class: "text-xs font-semibold" %><br />
+      <%= form.number_field :unit_rate,
+                            step: 0.0001,
+                            min: 0,
+                            class: "w-32 h-10 rounded border px-2 py-1 text-sm" %>
+    </div>
+
+    <div>
+      <%= form.label :standing_rate, "Standing (£/day)", class: "text-xs font-semibold" %><br />
+      <%= form.number_field :standing_rate,
+                            step: 0.0001,
+                            min: 0,
+                            class: "w-36 h-10 rounded border px-2 py-1 text-sm" %>
+    </div>
+
+    <div>
+      <%= form.label :from_date, "From", class: "text-xs font-semibold" %><br />
+      <%= form.date_field :from_date,
+                          class: "w-36 h-10 rounded border px-2 py-1 text-sm" %>
+    </div>
+
+    <div>
+      <%= form.label :to_date, "To", class: "text-xs font-semibold" %><br />
+      <%= form.date_field :to_date,
+                          class: "w-36 h-10 rounded border px-2 py-1 text-sm" %>
+    </div>
+
+    <div class="flex items-end mb-0.5">
+      <%= form.submit submit_text,
+                      class: "h-10 rounded px-4 bg-[#ffb400] text-[#181818] text-sm font-medium hover:bg-[#173f2d]" %>
+    </div>
+  </div>
+<% end %>

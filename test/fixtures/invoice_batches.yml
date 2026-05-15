@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  park: one
+  start_date: 2026-05-11
+  end_date: 2026-05-11
+  invoice_date: 2026-05-11
+  due_date: 2026-05-11
+  notes: MyText
+  reading: 
+
+two:
+  park: two
+  start_date: 2026-05-11
+  end_date: 2026-05-11
+  invoice_date: 2026-05-11
+  due_date: 2026-05-11
+  notes: MyText
+  reading: 

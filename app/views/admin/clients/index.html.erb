@@ -1,0 +1,250 @@
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Clients
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        Park residents and their assigned pitches
+      </p>
+    </div>
+
+    <button
+      type="button"
+      data-action="click->modal#open"
+      data-modal-id="create-client"
+      class="bg-[#ffb400] py-2 px-4 rounded flex gap-2 hover:bg-[#ffc029] items-center"
+    >
+      <%= render 'icons/plus', size: '16px', colour: '#181818' %>
+
+      <p class="text-[#181818] text-sm font-medium">
+        Add Client
+      </p>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg overflow-hidden border">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-white">
+      <tr>
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Client
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Contact
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Pitch
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Park
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Balance
+        </th>
+
+        <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">
+          Actions
+        </th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y divide-gray-200 bg-white">
+      <% @clients.each do |client| %>
+        <% initials = client.full_name.to_s.split.map { |name| name[0] }.join.first(2).upcase.presence || "CL" %>
+
+        <tr>
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="flex gap-2 items-center">
+              <div class="bg-[#ffb40010] rounded-full w-9 h-9 flex items-center justify-center">
+                <p class="text-[#ffb400] text-xs/[16px] font-semibold">
+                  <%= initials %>
+                </p>
+              </div>
+
+              <p class="font-medium">
+                <%= client.full_name.presence || "Unnamed client" %>
+              </p>
+            </div>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="flex flex-col gap-1">
+              <div class="flex gap-1.5 items-center">
+                <%= render 'icons/envelope', size: '12px', colour: '#63746b' %>
+
+                <p class="text-[#63746b] text-xs">
+                  <%= client.email %>
+                </p>
+              </div>
+
+              <div class="flex gap-1.5 items-center">
+                <%= render 'icons/phone', size: '12px', colour: '#63746b' %>
+
+                <p class="text-[#63746b] text-xs">
+                  <%= client.phone_number.presence || "No phone number" %>
+                </p>
+              </div>
+            </div>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+            <%= client.pitch&.pitch_number || "Unassigned" %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= client.pitch&.park&.name || "No park" %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            £0.00
+          </td>
+
+          <td class="px-4 py-3 text-sm">
+            <div class="flex justify-end items-center">
+              <button
+                type="button"
+                data-action="click->modal#open"
+                data-modal-id="edit-client-<%= client.id %>"
+                class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#f5f5f5]"
+              >
+                <%= render 'icons/edit', size: '16px', colour: '#63746b' %>
+              </button>
+
+              <button
+                type="button"
+                data-action="click->modal#open"
+                data-modal-id="delete-client-<%= client.id %>"
+                class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+              >
+                <%= render 'icons/bin', size: '16px', colour: '#db2424' %>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Edit Modal -->
+        <div
+          id="edit-client-<%= client.id %>"
+          data-modal
+          class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+        >
+          <div
+            class="absolute inset-0"
+            data-action="click->modal#close"
+          ></div>
+
+          <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <h2 class="text-xl font-semibold text-[#17261f]">
+                  Edit Client
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                data-action="click->modal#close"
+                class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+              >
+                  <span class="text-[#17261f80] text-lg leading-none">
+                    ×
+                  </span>
+              </button>
+            </div>
+
+            <%= render "admin/clients/form", client: client %>
+          </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div
+          id="delete-client-<%= client.id %>"
+          data-modal
+          class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+        >
+          <div
+            class="absolute inset-0"
+            data-action="click->modal#close"
+          ></div>
+
+          <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div class="mb-6">
+              <h2 class="text-xl font-semibold text-[#17261f]">
+                Delete Client
+              </h2>
+
+              <p class="text-sm text-[#17261f80] mt-2">
+                Are you sure you want to delete
+                <span class="font-semibold text-[#17261f]">
+                  <%= client.full_name.presence || client.email %>
+                </span>?
+                Their assigned pitch will become unassigned.
+              </p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                data-action="click->modal#close"
+                class="rounded border px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+
+              <%= button_to "Delete",
+                            admin_client_path(client),
+                            method: :delete,
+                            data: { turbo: false },
+                            class: "bg-[#db2424] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#b91c1c]" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pt-4">
+    <%= will_paginate @clients %>
+  </div>
+
+  <!-- Create Modal -->
+  <div
+    id="create-client"
+    data-modal
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+  >
+    <div
+      class="absolute inset-0"
+      data-action="click->modal#close"
+    ></div>
+
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h2 class="text-xl font-semibold text-[#17261f]">
+            New Client
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+        >
+          <span class="text-[#17261f80] text-lg leading-none">
+            ×
+          </span>
+        </button>
+      </div>
+
+      <%= render "admin/clients/form", client: @client %>
+    </div>
+  </div>
+</div>

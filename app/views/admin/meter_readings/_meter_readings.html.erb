@@ -1,0 +1,220 @@
+<%= form_with url: admin_meter_readings_path,
+              method: :get,
+              data: { turbo_frame: "meter_readings" },
+              class: "flex justify-between mb-6 w-full" do %>
+  <div class="flex gap-5">
+    <div class="flex gap-2 items-center">
+      <p>Park:</p>
+
+      <select name="park" class="py-1.5 px-3 border rounded bg-transparent" onchange="this.form.requestSubmit()">
+        <option value="">All Parks</option>
+
+        <% @parks.each do |park| %>
+          <option value="<%= park.id %>" <%= "selected" if params[:park] == park.id.to_s %>>
+            <%= park.name %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="flex gap-2 items-center">
+      <p>Utility:</p>
+
+      <select name="utility" class="py-1.5 px-3 border rounded bg-transparent" onchange="this.form.requestSubmit()">
+        <option value="">Gas & Electric</option>
+        <option value="Electric" <%= "selected" if params[:utility] == "Electric" %>>Electric</option>
+        <option value="Gas" <%= "selected" if params[:utility] == "Gas" %>>Gas</option>
+      </select>
+    </div>
+
+    <div class="flex gap-2 items-center">
+      <p>Month:</p>
+
+      <select name="month" class="py-1.5 px-3 border rounded bg-transparent" onchange="this.form.requestSubmit()">
+        <% @dates.each do |date| %>
+          <% value = date.gsub(" ", "-") %>
+
+          <option
+            value="<%= value %>"
+            <%= "selected" if params[:month].presence == value || params[:month].blank? && date == Time.current.strftime("%B %Y") %>
+          >
+            <%= date %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex items-center">
+    <p><%= readings.total_entries %> Readings</p>
+  </div>
+<% end %>
+
+<div>
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-white">
+    <tr>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Client</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Pitch</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Utility</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Start Date</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">End Date</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Prev Close</th>
+      <th class="px-4 h-12 text-sm font-medium text-[#17261f80]">Opening</th>
+      <th class="px-4 h-12 text-sm font-medium text-[#17261f80]">Closing</th>
+      <th class="px-4 h-12 text-sm font-medium text-[#17261f80]">Consumption</th>
+      <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">Actions</th>
+    </tr>
+    </thead>
+
+    <tbody class="divide-y divide-gray-200 bg-white">
+    <% readings.each do |reading| %>
+      <% unit = reading.utility == "Gas" ? "m³" : "kWh" %>
+
+      <tr data-controller="meter-reading">
+        <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+          <%= reading.user.full_name %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700">
+          <%= reading.pitch.pitch_number %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700">
+          <% if reading.utility == "Electric" %>
+              <span class="size-fit rounded-full bg-[#ffb400] px-3 py-1 text-xs font-medium text-[#181818] flex gap-1 items-center">
+                <%= electric_icon %>
+                Electric
+              </span>
+          <% elsif reading.utility == "Gas" %>
+              <span class="size-fit rounded-full bg-[#fbfbf9] px-3 py-1 text-xs font-medium text-[#63746b] flex gap-1 items-center">
+                <%= gas_icon %>
+                Gas
+              </span>
+          <% end %>
+        </td>
+
+        <% if @current_month_selected %>
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <input
+              type="date"
+              value="<%= reading.start_date&.strftime('%Y-%m-%d') %>"
+              class="rounded border px-2 py-1 text-sm"
+              data-meter-reading-target="startDate"
+              data-action="change->meter-reading#update"
+            >
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <input
+              type="date"
+              value="<%= reading.end_date&.strftime('%Y-%m-%d') %>"
+              class="rounded border px-2 py-1 text-sm"
+              data-meter-reading-target="endDate"
+              data-action="change->meter-reading#update"
+            >
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= reading.opening_reading&.round(0) || "-" %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <input
+              type="number"
+              value="<%= reading.opening_reading&.round(0) %>"
+              class="w-24 rounded border px-2 py-1 text-sm"
+              data-meter-reading-target="opening"
+              data-action="input->meter-reading#update"
+            >
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <input
+              type="number"
+              value="<%= reading.closing_reading&.round(0) %>"
+              class="w-24 rounded border px-2 py-1 text-sm"
+              data-meter-reading-target="closing"
+              data-action="input->meter-reading#update"
+            >
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="px-2 py-1 bg-[#ffb40020] text-[#ffb400] size-fit rounded">
+                <span
+                  data-meter-reading-target="consumption"
+                  data-unit="<%= unit %>"
+                  data-update-url="<%= admin_meter_reading_path(reading) %>"
+                >
+                  <% if reading.consumption.present? %>
+                    <%= reading.consumption.round(0) %> <%= unit %>
+                  <% else %>
+                    -
+                  <% end %>
+                </span>
+            </div>
+          </td>
+        <% else %>
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="rounded border px-2 py-1 text-sm tracking-[1px]">
+              <%= reading.start_date.strftime("%d/%m/%Y") %>
+            </div>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="rounded border px-2 py-1 text-sm tracking-[1px]">
+              <%= reading.end_date.strftime("%d/%m/%Y") %>
+            </div>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <%= reading.opening_reading&.round(0) || "-" %>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="w-24 rounded border px-2 py-1 text-sm">
+              <%= reading.opening_reading&.round(0) || "-" %>
+            </div>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="w-24 rounded border px-2 py-1 text-sm">
+              <%= reading.closing_reading&.round(0) || "-" %>
+            </div>
+          </td>
+
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="px-2 py-1 bg-[#ffb40020] text-[#ffb400] size-fit rounded">
+              <% if reading.consumption.present? %>
+                <%= reading.consumption.round(0) %> <%= unit %>
+              <% else %>
+                -
+              <% end %>
+            </div>
+          </td>
+        <% end %>
+
+        <td class="px-4 py-3 text-sm">
+          <div class="flex justify-end items-center">
+            <button
+              type="button"
+              class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+            >
+              <%= bin_icon %>
+            </button>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if readings.total_pages > 1 %>
+  <div class="mt-6 flex justify-center">
+    <%= will_paginate readings,
+                      renderer: WillPaginateTurboHelper::TurboLinkRenderer,
+                      params: request.query_parameters.except(:page)
+    %>
+  </div>
+<% end %>

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  park: one
+  utility: MyString
+  unit_rate: 9.99
+  standing_rate: 9.99
+  active: false
+
+two:
+  park: two
+  utility: MyString
+  unit_rate: 9.99
+  standing_rate: 9.99
+  active: false

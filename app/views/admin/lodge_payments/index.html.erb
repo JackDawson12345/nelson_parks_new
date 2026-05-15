@@ -1,0 +1,32 @@
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Lodge Payments
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        Track lodge payments by park and year
+      </p>
+    </div>
+
+    <button
+      type="button"
+      data-action="click->modal#open"
+      data-modal-id="lodge-payment-modal"
+      class="bg-[#ffc029] py-2 px-4 rounded flex gap-2 items-center hover:bg-[#ffc029] transition"
+    >
+      <%= render 'icons/plus', size: '16px', colour: '#181818' %>
+
+      <p class="text-[#181818] text-sm font-medium">
+        Add Lodge Payment
+      </p>
+    </button>
+  </div>
+
+  <%= render "form", lodge_payment: @lodge_payment %>
+
+  <%= turbo_frame_tag "lodge_payments" do %>
+    <%= render "lodge_payments", lodge_payments: @lodge_payments %>
+  <% end %>
+</div>

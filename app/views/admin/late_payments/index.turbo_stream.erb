@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "late_payments" do %>
+  <%= turbo_frame_tag "late_payments" do %>
+    <%= render "late_payments", late_payments: @late_payments %>
+  <% end %>
+<% end %>

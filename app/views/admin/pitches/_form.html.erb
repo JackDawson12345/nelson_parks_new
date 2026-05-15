@@ -1,0 +1,104 @@
+<%= form_with model: [:admin, pitch], class: "space-y-4" do |form| %>
+  <% if pitch.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h3 class="text-sm font-semibold text-red-700 mb-2">
+        Please fix the following:
+      </h3>
+
+      <ul class="text-sm text-red-600 list-disc pl-5 space-y-1">
+        <% pitch.errors.full_messages.each do |message| %>
+          <li>
+            <%= message %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="flex gap-2">
+    <div class="w-1/2">
+      <%= form.label :pitch_number,
+                     class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.text_field :pitch_number,
+                          required: true,
+                          class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                          placeholder: "A-12" %>
+    </div>
+    <div class="w-1/2">
+      <%= form.label :park_id,
+                     "Park",
+                     class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.collection_select :park_id,
+                                 Park.all,
+                                 :id,
+                                 :name,
+                                 { prompt: "Select park" },
+                                 {
+                                   required: true,
+                                   class: "mt-1 w-full rounded border px-3 py-2 text-sm"
+                                 } %>
+    </div>
+  </div>
+
+  <div class="flex gap-2">
+    <div class="w-1/2">
+      <%= form.label :pitch_type,
+                     class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.select :pitch_type,
+                      ["Static", "Touring", "Seasonal"],
+                      { prompt: "Select type" },
+                      {
+                        required: true,
+                        class: "mt-1 w-full rounded border px-3 py-2 text-sm"
+                      } %>
+    </div>
+
+    <div class="w-1/2">
+      <%= form.label :status,
+                     class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.select :status,
+                      ["Occupied", "Vacant", "Maintenance"],
+                      { prompt: "Select status" },
+                      {
+                        required: true,
+                        class: "mt-1 w-full rounded border px-3 py-2 text-sm"
+                      } %>
+    </div>
+  </div>
+
+
+
+  <div>
+    <%= form.label :user_id,
+                   "Client",
+                   class: "block text-sm font-medium text-[#17261f]" %>
+
+    <%= form.collection_select :user_id,
+                               User
+                                 .where(admin: false)
+                                 .where.not(id: Pitch.where.not(user_id: nil).where.not(id: pitch.id).select(:user_id)),
+                               :id,
+                               :full_name,
+                               { prompt: "Select client (optional)" },
+                               {
+                                 class: "mt-1 w-full rounded border px-3 py-2 text-sm"
+                               } %>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-4">
+    <button
+      type="button"
+      data-action="click->modal#close"
+      class="rounded border px-4 py-2 text-sm hover:bg-[#f8f8f8]"
+    >
+      Cancel
+    </button>
+
+    <%= form.submit pitch.persisted? ? "Update Pitch" : "Create Pitch",
+                    class: "bg-[#ffb400] text-[#181818] py-2 px-4 rounded text-sm font-medium hover:bg-[#ffc029]" %>
+  </div>
+<% end %>

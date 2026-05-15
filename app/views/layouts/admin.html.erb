@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for(:title) || "Nelsonparksnew" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= yield :head %>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon.png" type="image/png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+
+</head>
+
+<body class="flex">
+  <div id="sidebar" class="w-[17.5%] bg-[#181818] min-h-screen transition-all duration-300">
+    <div id="sidebar-header" class="p-5 border-b border-[#333]">
+      <div id="sidebar-brand" class="flex items-center gap-2 transition-all duration-300">
+        <div class="w-9 h-9 rounded bg-[#ffb400] flex items-center justify-center">
+          <%= render "icons/parks", size: '20px', colour: '#181818' %>
+        </div>
+        <div>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0] font-semibold">Nelson Parks</p>
+          <p class="sidebar-text text-[10px]/[12.5px] uppercase text-[#dce5e0]/60">CRM Suite</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-3">
+      <p class="sidebar-text text-xs/[16px] font-medium text-[#dce5e0]/50 px-2">Workspace</p>
+      <div class="space-y-1.5 pt-1">
+        <%
+          base_classes = "sidebar-link flex items-center gap-2 py-1.5 px-2 rounded transition-all duration-300"
+          inactive_classes = "hover:bg-[#333]"
+          active_classes = "bg-[#333] font-semibold"
+        %>
+
+        <%= link_to admin_dashboard_path,
+                    class: "#{base_classes} #{controller_name == 'dashboard' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/dashboard", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Dashboard</p>
+        <% end %>
+
+        <hr class="border-[#333] ">
+
+        <%= link_to admin_parks_path,
+                    class: "#{base_classes} #{controller_name == 'parks' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/parks", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Parks</p>
+        <% end %>
+
+        <%= link_to admin_pitches_path,
+                    class: "#{base_classes} #{controller_name == 'pitches' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/pitches", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Pitches</p>
+        <% end %>
+
+        <%= link_to admin_clients_path,
+                    class: "#{base_classes} #{controller_name == 'clients' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/clients", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Clients</p>
+        <% end %>
+
+        <hr class="border-[#333] ">
+
+        <%= link_to admin_meter_readings_path,
+                    class: "#{base_classes} #{controller_name == 'meter_readings' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/meterreadings", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Meter Readings</p>
+        <% end %>
+
+        <%= link_to admin_pitch_fees_path,
+                    class: "#{base_classes} #{controller_name == 'pitch_fees' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/pitchfees", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Pitch Fees</p>
+        <% end %>
+
+        <%= link_to admin_utilities_path,
+                    class: "#{base_classes} #{controller_name == 'utilities' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/utilities", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Utilities</p>
+        <% end %>
+
+        <%= link_to admin_lodge_payments_path,
+                    class: "#{base_classes} #{controller_name == 'lodge_payments' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/lodge", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Lodge Payments</p>
+        <% end %>
+
+        <%= link_to admin_late_payments_path,
+                    class: "#{base_classes} #{controller_name == 'late_payments' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/clock", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Late Payments</p>
+        <% end %>
+
+        <hr class="border-[#333] ">
+
+        <%= link_to admin_invoices_path,
+                    class: "#{base_classes} #{controller_name == 'invoices' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/invoices", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Invoices</p>
+        <% end %>
+
+        <%= link_to admin_invoice_batches_path,
+                    class: "#{base_classes} #{controller_name == 'invoice_batches' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/invoicebatches", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Invoice Batches</p>
+        <% end %>
+
+        <%= link_to admin_exports_path,
+                    class: "#{base_classes} #{controller_name == 'exports' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/exports", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Exports</p>
+        <% end %>
+
+        <hr class="border-[#333] ">
+
+        <%= link_to admin_settings_path,
+                    class: "#{base_classes} #{controller_name == 'settings' ? active_classes : inactive_classes}" do %>
+          <%= render "icons/settings", size: '16px', colour: '#dce5e090' %>
+          <p class="sidebar-text text-sm/[20px] text-[#dce5e0]">Settings</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div id="main-content" class="w-[82.5%] transition-all duration-300">
+
+    <div class="min-h-[56px] border-b flex justify-between px-4">
+      <div class="w-1/2 flex items-center gap-3">
+        <div class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#edf2f0]">
+          <button id="sidebar-toggle" type="button" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#edf2f0]">
+            <%= render 'icons/sidebar', size: '16px', colour: 'hsl(150 25% 12%)' %>
+          </button>
+        </div>
+        <%= form_with url: "/search", method: :get, local: true, class: "flex items-center" do %>
+          <div class="h-9 w-[450px] bg-[hsl(150_15%_94%_/_0.6)] rounded flex items-center px-3 relative">
+            <%= render 'icons/search', size: '16px', colour: '#63746b' %>
+            <%= text_field_tag :q, params[:q],
+                               placeholder: "Search clients, pitches, parks...",
+                               class: "pl-7 w-full bg-transparent border-0 outline-none focus:ring-0 text-sm placeholder:text-gray-500"
+            %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="w-1/2 flex justify-end items-center gap-3">
+        <div class="relative" id="notifications-wrapper">
+          <button
+            id="notifications-toggle"
+            type="button"
+            class="relative w-7 h-7 flex items-center justify-center rounded hover:bg-[#edf2f0]"
+          >
+            <%= render 'icons/bell', size: '16px', colour: '#63746b' %>
+
+            <% if current_user.notifications.where(seen: false).exists? %>
+              <div id="notifications-dot" class="absolute top-1 right-1 w-2 h-2 bg-[#ffb400] rounded-full"></div>
+            <% end %>
+          </button>
+
+          <div
+            id="notifications-dropdown"
+            style="top: 41.5px !important; border-radius: 0px 0px 10px 10px !important;"
+            class="hidden absolute right-0 w-80 bg-white border border-[#e5e7eb] rounded-lg shadow-lg z-50 overflow-hidden"
+          >
+            <div class="px-4 py-3 border-b">
+              <p class="text-sm font-semibold text-[#173025]">Notifications</p>
+            </div>
+
+            <div class="max-h-80 overflow-auto">
+              <% notifications = current_user.notifications.order(created_at: :desc).limit(10) %>
+
+              <% if notifications.any? %>
+                <% notifications.each do |notification| %>
+                  <div class="px-4 py-3 border-b last:border-b-0 <%= notification.seen? ? 'bg-white' : 'bg-[#f3f8f5]' %>">
+                    <p class="text-sm font-semibold text-[#173025]">
+                      <%= notification.title %>
+                    </p>
+                    <p class="text-xs text-[#63746b] mt-1">
+                      <%= notification.text %>
+                    </p>
+                    <p class="text-[10px] text-[#63746b]/70 mt-1">
+                      <%= time_ago_in_words(notification.created_at) %> ago
+                    </p>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="px-4 py-6 text-center">
+                  <p class="text-sm text-[#63746b]">No notifications</p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="relative" id="account-wrapper">
+          <button
+            id="account-toggle"
+            type="button"
+            class="w-9 h-9 rounded-full bg-gradient-to-br from-[#ffb400] to-[hsl(152_55%_22%/0)] flex items-center justify-center"
+          >
+            <p class="text-[#181818] text-xs/[16px] font-semibold">
+              <%= current_user.full_name&.split&.map(&:first)&.join || "NP" %>
+            </p>
+          </button>
+
+          <div
+            id="account-dropdown"
+            style="top: 45.5px !important; border-radius: 0px 0px 10px 10px !important;"
+            class="hidden absolute right-0 w-52 bg-white border border-[#e5e7eb] rounded-lg shadow-lg z-50 overflow-hidden"
+          >
+            <div class="py-1">
+              <%= link_to admin_settings_path,
+                          class: "flex items-center gap-2 px-4 py-2.5 hover:bg-[#f6f8f7] transition-all duration-150" do %>
+
+                <%= render "icons/settings", size: '14px', colour: '#63746b' %>
+
+                <p class="text-sm text-[#173025]">Settings</p>
+              <% end %>
+
+              <%= button_to destroy_user_session_path,
+                            method: :delete,
+                            class: "w-full flex items-center gap-2 px-4 py-2.5 hover:bg-[#f6f8f7] transition-all duration-150 text-left" do %>
+
+                <p class="text-sm text-[#173025]">Logout</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-5 bg-[#fbfbf9] min-h-[calc(100vh-56px)] max-h-[calc(100vh-56px)] overflow-auto">
+      <%= yield %>
+    </div>
+  </div>
+
+
+  <div class="absolute bottom-2 right-2">
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+  </div>
+
+  <div id="flash"></div>
+
+  <script>
+      document.addEventListener("turbo:load", setupLayoutMenus);
+      document.addEventListener("turbo:render", setupLayoutMenus);
+
+      function setupLayoutMenus() {
+          if (window.layoutMenusLoaded) return;
+          window.layoutMenusLoaded = true;
+
+          const sidebar = document.getElementById("sidebar");
+          const mainContent = document.getElementById("main-content");
+          const toggle = document.getElementById("sidebar-toggle");
+
+          if (sidebar && mainContent && toggle) {
+              const sidebarText = document.querySelectorAll(".sidebar-text");
+              const sidebarLinks = document.querySelectorAll(".sidebar-link");
+              const sidebarHeader = document.getElementById("sidebar-header");
+              const sidebarBrand = document.getElementById("sidebar-brand");
+
+              const applyCollapsedState = (collapsed) => {
+                  if (collapsed) {
+                      sidebar.classList.remove("w-[17.5%]");
+                      sidebar.classList.add("w-[64px]");
+
+                      mainContent.classList.remove("w-[82.5%]");
+                      mainContent.classList.add("w-[calc(100%-64px)]");
+
+                      sidebarHeader?.classList.remove("p-5");
+                      sidebarHeader?.classList.add("px-3", "pt-5", "pb-2");
+
+                      sidebarBrand?.classList.add("flex-col");
+
+                      sidebarText.forEach((el) => el.classList.add("hidden"));
+                      sidebarLinks.forEach((link) => link.classList.add("justify-center"));
+                  } else {
+                      sidebar.classList.add("w-[17.5%]");
+                      sidebar.classList.remove("w-[64px]");
+
+                      mainContent.classList.add("w-[82.5%]");
+                      mainContent.classList.remove("w-[calc(100%-64px)]");
+
+                      sidebarHeader?.classList.remove("px-3", "pt-5", "pb-2");
+                      sidebarHeader?.classList.add("p-5");
+
+                      sidebarBrand?.classList.remove("flex-col");
+
+                      sidebarText.forEach((el) => el.classList.remove("hidden"));
+                      sidebarLinks.forEach((link) => link.classList.remove("justify-center"));
+                  }
+              };
+
+              let collapsed = localStorage.getItem("sidebarCollapsed") === "true";
+
+              applyCollapsedState(collapsed);
+
+              toggle.addEventListener("click", () => {
+                  collapsed = !collapsed;
+                  localStorage.setItem("sidebarCollapsed", collapsed);
+                  applyCollapsedState(collapsed);
+              });
+          }
+
+          const notificationsWrapper = document.getElementById("notifications-wrapper");
+          const notificationsToggle = document.getElementById("notifications-toggle");
+          const notificationsDropdown = document.getElementById("notifications-dropdown");
+
+          if (notificationsWrapper && notificationsToggle && notificationsDropdown) {
+              notificationsToggle.addEventListener("click", async (event) => {
+                  event.stopPropagation();
+
+                  notificationsDropdown.classList.toggle("hidden");
+                  document.getElementById("account-dropdown")?.classList.add("hidden");
+
+                  const notificationsDot = document.getElementById("notifications-dot");
+                  const csrfToken = document.querySelector("meta[name='csrf-token']")?.content;
+
+                  if (!csrfToken) return;
+
+                  try {
+                      const response = await fetch("/admin/notifications/mark_as_seen", {
+                          method: "PATCH",
+                          headers: {
+                              "X-CSRF-Token": csrfToken,
+                              "Accept": "application/json"
+                          }
+                      });
+
+                      if (response.ok) {
+                          notificationsDot?.remove();
+
+                          notificationsDropdown.querySelectorAll(".bg-\\[\\#f3f8f5\\]").forEach((el) => {
+                              el.classList.remove("bg-[#f3f8f5]");
+                              el.classList.add("bg-white");
+                          });
+                      }
+                  } catch (error) {
+                      console.error("Failed to mark notifications as seen", error);
+                  }
+              });
+          }
+
+          const accountWrapper = document.getElementById("account-wrapper");
+          const accountToggle = document.getElementById("account-toggle");
+          const accountDropdown = document.getElementById("account-dropdown");
+
+          if (accountWrapper && accountToggle && accountDropdown) {
+              accountToggle.addEventListener("click", (event) => {
+                  event.stopPropagation();
+
+                  accountDropdown.classList.toggle("hidden");
+                  notificationsDropdown?.classList.add("hidden");
+              });
+          }
+
+          document.addEventListener("click", (event) => {
+              if (notificationsWrapper && !notificationsWrapper.contains(event.target)) {
+                  notificationsDropdown?.classList.add("hidden");
+              }
+
+              if (accountWrapper && !accountWrapper.contains(event.target)) {
+                  accountDropdown?.classList.add("hidden");
+              }
+          });
+      }
+
+      document.addEventListener("turbo:before-cache", () => {
+          window.layoutMenusLoaded = false;
+
+          document.getElementById("notifications-dropdown")?.classList.add("hidden");
+          document.getElementById("account-dropdown")?.classList.add("hidden");
+      });
+  </script>
+</body>
+</html>

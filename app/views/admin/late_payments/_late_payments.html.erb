@@ -1,0 +1,177 @@
+<%= form_with url: admin_late_payments_path,
+              method: :get,
+              data: { turbo_frame: "late_payments" },
+              class: "flex justify-between mb-6 w-full" do %>
+  <div class="flex gap-5">
+    <div class="flex gap-2 items-center">
+      <p>Park:</p>
+
+      <select name="park" class="py-1.5 px-3 border rounded bg-transparent" onchange="this.form.requestSubmit()">
+        <option value="">All Parks</option>
+
+        <% @parks.each do |park| %>
+          <option value="<%= park.id %>" <%= "selected" if params[:park] == park.id.to_s %>>
+            <%= park.name %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="flex gap-2 items-center">
+      <p>Month:</p>
+
+      <select
+        name="month"
+        class="py-1.5 px-3 border rounded bg-transparent"
+        onchange="this.form.requestSubmit()"
+      >
+        <% @dates.each do |month| %>
+          <option value="<%= month %>" <%= "selected" if @selected_month == month %>>
+            <%= month %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex items-center">
+    <p><%= late_payments.total_entries %> Late Payments</p>
+  </div>
+<% end %>
+
+<div>
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-white">
+    <tr>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Client</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Park</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Pitch</th>
+      <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">Due Date</th>
+      <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">VAT %</th>
+      <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">Net</th>
+      <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">VAT</th>
+      <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">Total</th>
+      <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">Actions</th>
+    </tr>
+    </thead>
+
+    <tbody class="divide-y divide-gray-200 bg-white">
+    <% late_payments.each do |late_payment| %>
+      <tr>
+        <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+          <%= late_payment.user.full_name %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700">
+          <%= late_payment.park.name %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700">
+          <%= late_payment.pitch.pitch_number %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700">
+          <%= late_payment.due_date.strftime("%d/%m/%Y") if late_payment.due_date.present? %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+          <%= number_to_percentage(late_payment.vat, precision: 2) %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+          <%= number_to_currency(late_payment.net_total, unit: "£") %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+          <%= number_to_currency(late_payment.vat_total, unit: "£") %>
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700 text-right font-medium">
+          <%= number_to_currency(late_payment.total, unit: "£") %>
+        </td>
+
+        <td class="px-4 py-3">
+          <div class="flex justify-end items-center gap-4">
+            <button
+              type="button"
+              data-action="click->modal#open"
+              data-modal-id="edit-late-payment-<%= late_payment.id %>"
+              class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#f5f5f5]"
+            >
+              <%= edit_icon %>
+            </button>
+
+            <button
+              type="button"
+              data-action="click->modal#open"
+              data-modal-id="delete-late-payment-<%= late_payment.id %>"
+              class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+            >
+              <%= bin_icon %>
+            </button>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if late_payments.total_pages > 1 %>
+  <div class="mt-6 flex justify-center">
+    <%= will_paginate late_payments,
+                      renderer: WillPaginateTurboHelper::TurboLinkRenderer,
+                      params: request.query_parameters.except(:page)
+    %>
+  </div>
+<% end %>
+
+<% late_payments.each do |late_payment| %>
+  <%= render "form", late_payment: late_payment %>
+
+  <div
+    id="delete-late-payment-<%= late_payment.id %>"
+    data-modal
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+  >
+    <div
+      class="absolute inset-0"
+      data-action="click->modal#close"
+    ></div>
+
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold text-[#17261f]">
+          Delete Late Payment
+        </h2>
+
+        <p class="text-sm text-[#17261f80] mt-2">
+          Are you sure you want to delete this late payment for
+          <span class="font-semibold text-[#17261f]">
+            <%= late_payment.user.full_name %>
+          </span>
+          on pitch
+          <span class="font-semibold text-[#17261f]">
+            <%= late_payment.pitch.pitch_number %>
+          </span>?
+        </p>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="rounded border px-4 py-2 text-sm"
+        >
+          Cancel
+        </button>
+
+        <%= button_to "Delete",
+                      admin_late_payment_path(late_payment),
+                      method: :delete,
+                      data: { turbo: false },
+                      class: "bg-[#db2424] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#b91c1c]" %>
+      </div>
+    </div>
+  </div>
+<% end %>

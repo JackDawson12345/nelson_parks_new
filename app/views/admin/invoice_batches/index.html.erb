@@ -1,0 +1,606 @@
+<%= turbo_stream_from "invoice_batches" %>
+
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Invoice Batches
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        Group and dispatch invoices in batches
+      </p>
+    </div>
+
+    <button
+      type="button"
+      data-action="click->modal#open"
+      data-modal-id="create-invoice-batch"
+      class="bg-[#ffb400] py-2 px-4 rounded flex gap-2 hover:bg-[#ffc029] items-center"
+    >
+      <%= render 'icons/plus', size: '16px', colour: '#181818' %>
+
+      <p class="text-[#181818] text-sm font-medium">
+        New Batch
+      </p>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg overflow-hidden border">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-white">
+      <tr>
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Reference
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Created
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Clients
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Status
+        </th>
+
+        <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+          Total
+        </th>
+
+        <th class="px-4 h-12 text-right text-sm font-medium text-[#17261f80]">
+          Actions
+        </th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y divide-gray-200 bg-white">
+        <%= render partial: "admin/invoice_batches/invoice_batch",
+                 collection: @invoice_batches,
+                 as: :invoice_batch %>
+      </tbody>
+    </table>
+  </div>
+
+  <% @invoice_batches.each do |invoice_batch| %>
+    <!-- View Modal -->
+    <div
+      id="view-invoice-batch-<%= invoice_batch.id %>"
+      data-modal
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+    >
+      <div
+        class="absolute inset-0"
+        data-action="click->modal#close"
+      ></div>
+
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h2 class="text-xl font-semibold text-[#17261f]">
+              <%= invoice_batch.reference %>
+            </h2>
+
+            <p class="text-sm text-[#17261f80]">
+              <%= invoice_batch.park&.name || "No park" %>
+              ·
+              <%= invoice_batch.start_date&.strftime("%d-%m-%Y") %>
+              to
+              <%= invoice_batch.end_date&.strftime("%d-%m-%Y") %>
+            </p>
+          </div>
+
+          <button
+            type="button"
+            data-action="click->modal#close"
+            class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+          >
+            <span class="text-[#17261f80] text-lg leading-none">
+              ×
+            </span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4 mb-4">
+          <div class="rounded-lg border p-4">
+            <p class="text-sm text-[#17261f80]">
+              Park
+            </p>
+
+            <p class="text-sm font-semibold text-[#17261f]">
+              <%= invoice_batch.park&.name || "No park" %>
+            </p>
+          </div>
+
+          <div class="rounded-lg border p-4">
+            <p class="text-sm text-[#17261f80]">
+              Utility
+            </p>
+
+            <p class="text-sm font-semibold text-[#17261f]">
+              <%= invoice_batch.utility || "N/A" %>
+            </p>
+          </div>
+
+          <div
+            id="invoice_batch_status_<%= invoice_batch.id %>"
+            class="rounded-lg border p-4"
+          >
+            <p class="text-sm text-[#17261f80]">
+              Status
+            </p>
+
+            <p class="text-sm font-semibold text-[#17261f]">
+              <%= invoice_batch.status %>
+            </p>
+          </div>
+
+          <div class="rounded-lg border p-4">
+            <p class="text-sm text-[#17261f80]">
+              Readings
+            </p>
+
+            <p class="text-sm font-semibold text-[#17261f]">
+              <%= (invoice_batch.reading || []).count %>
+            </p>
+          </div>
+        </div>
+
+        <div class="max-h-[65vh] overflow-auto border rounded-lg">
+          <% if invoice_batch.utility == 'Gas' or invoice_batch.utility == 'Electric' %>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-white sticky top-0">
+              <tr>
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Client
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Pitch
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Utility
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Opening
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Closing
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Consumption
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Total Price
+                </th>
+              </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-200 bg-white">
+              <% (invoice_batch.reading || []).each do |reading| %>
+                <% user_id = reading["user_id"] || reading[:user_id] %>
+                <% pitch_id = reading["pitch_id"] || reading[:pitch_id] %>
+
+                <% user = @users_by_id[user_id.to_i] %>
+                <% pitch = @pitches_by_id[pitch_id.to_i] %>
+
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <p class="font-medium">
+                      <%= user&.full_name || user&.email || "User ##{user_id}" %>
+                    </p>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+                    <%= pitch&.pitch_number || "Pitch ##{pitch_id}" %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["utility"] || reading[:utility] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["opening_reading"] || reading[:opening_reading] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["closing_reading"] || reading[:closing_reading] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    <%= reading["consumption"] || reading[:consumption] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    £<%= reading["total_price"] || reading[:total_price] %>
+                  </td>
+                </tr>
+              <% end %>
+
+
+
+              <% if (invoice_batch.reading || []).empty? %>
+                <tr>
+                  <td colspan="6" class="px-4 py-6 text-center text-sm text-[#17261f80]">
+                    No readings found for this batch.
+                  </td>
+                </tr>
+              <% else %>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <p class="font-semibold">
+                      TOTAL
+                    </p>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    <%= invoice_batch.reading.sum { |reading| reading["opening_reading"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    <%= invoice_batch.reading.sum { |reading| reading["closing_reading"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    <%= invoice_batch.reading.sum { |reading| reading["consumption"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["total_price"].to_d }.to_f %>
+                  </td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
+          <% elsif invoice_batch.utility == 'Pitch Fees' or invoice_batch.utility == 'Utilities' or invoice_batch.utility == 'Lodge Payments' %>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-white sticky top-0">
+              <tr>
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Client
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Pitch
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Year
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Frequency
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  VAT
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Net Total
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  VAT Total
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Total
+                </th>
+              </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-200 bg-white">
+              <% (invoice_batch.reading || []).each do |reading| %>
+                <% user_id = reading["user_id"] || reading[:user_id] %>
+                <% pitch_id = reading["pitch_id"] || reading[:pitch_id] %>
+
+                <% user = @users_by_id[user_id.to_i] %>
+                <% pitch = @pitches_by_id[pitch_id.to_i] %>
+
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <p class="font-medium">
+                      <%= user&.full_name || user&.email || "User ##{user_id}" %>
+                    </p>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+                    <%= pitch&.pitch_number || "Pitch ##{pitch_id}" %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["year"] || reading[:year] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["frequency"] || reading[:frequency] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["vat"] || reading[:vat] %>%
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    <%= reading["net_total"] || reading[:net_total] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    £<%= reading["vat_total"] || reading[:vat_total] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    £<%= reading["total"] || reading[:total] %>
+                  </td>
+                </tr>
+              <% end %>
+
+
+
+              <% if (invoice_batch.reading || []).empty? %>
+                <tr>
+                  <td colspan="6" class="px-4 py-6 text-center text-sm text-[#17261f80]">
+                    No readings found for this batch.
+                  </td>
+                </tr>
+              <% else %>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <p class="font-semibold">
+                      TOTAL
+                    </p>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["net_total"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["vat_total"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["total"].to_d }.to_f %>
+                  </td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
+          <% elsif invoice_batch.utility == 'Late Payments' %>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-white sticky top-0">
+              <tr>
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Client
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Pitch
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Due Date
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  VAT
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Net Total
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  VAT Total
+                </th>
+
+                <th class="px-4 h-12 text-left text-sm font-medium text-[#17261f80]">
+                  Total
+                </th>
+              </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-200 bg-white">
+              <% (invoice_batch.reading || []).each do |reading| %>
+                <% user_id = reading["user_id"] || reading[:user_id] %>
+                <% pitch_id = reading["pitch_id"] || reading[:pitch_id] %>
+
+                <% user = @users_by_id[user_id.to_i] %>
+                <% pitch = @pitches_by_id[pitch_id.to_i] %>
+
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <p class="font-medium">
+                      <%= user&.full_name || user&.email || "User ##{user_id}" %>
+                    </p>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-[#19573a] font-medium">
+                    <%= pitch&.pitch_number || "Pitch ##{pitch_id}" %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["due_date"] || reading[:due_date] %>
+                  </td>
+
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <%= reading["vat"] || reading[:vat] %>%
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    <%= reading["net_total"] || reading[:net_total] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    £<%= reading["vat_total"] || reading[:vat_total] %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                    £<%= reading["total"] || reading[:total] %>
+                  </td>
+                </tr>
+              <% end %>
+
+
+
+              <% if (invoice_batch.reading || []).empty? %>
+                <tr>
+                  <td colspan="6" class="px-4 py-6 text-center text-sm text-[#17261f80]">
+                    No readings found for this batch.
+                  </td>
+                </tr>
+              <% else %>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-700">
+                    <p class="font-semibold">
+                      TOTAL
+                    </p>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["net_total"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["vat_total"].to_d }.to_f %>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-gray-700 font-semibold">
+                    £<%= invoice_batch.reading.sum { |reading| reading["total"].to_d }.to_f %>
+                  </td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
+          <% end %>
+
+        </div>
+
+        <%= render "admin/invoice_batches/actions", invoice_batch: invoice_batch %>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div
+      id="delete-invoice-batch-<%= invoice_batch.id %>"
+      data-modal
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+    >
+      <div
+        class="absolute inset-0"
+        data-action="click->modal#close"
+      ></div>
+
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold text-[#17261f]">
+            Delete Batch
+          </h2>
+
+          <p class="text-sm text-[#17261f80] mt-2">
+            Are you sure you want to delete
+            <span class="font-semibold text-[#17261f]">
+              <%= invoice_batch.reference %>
+            </span>?
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button
+            type="button"
+            data-action="click->modal#close"
+            class="rounded border px-4 py-2 text-sm"
+          >
+            Cancel
+          </button>
+
+          <%= button_to "Delete",
+                        admin_invoice_batch_path(invoice_batch),
+                        method: :delete,
+                        data: { turbo: false },
+                        class: "bg-[#db2424] text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#b91c1c]" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Create Modal -->
+  <div
+    id="create-invoice-batch"
+    data-modal
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+  >
+    <div
+      class="absolute inset-0"
+      data-action="click->modal#close"
+    ></div>
+
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h2 class="text-xl font-semibold text-[#17261f]">
+            New Batch
+          </h2>
+
+          <p class="text-sm text-[#17261f80]">
+            Create a new invoice batch
+          </p>
+        </div>
+
+        <button
+          type="button"
+          data-action="click->modal#close"
+          class="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6]"
+        >
+          <span class="text-[#17261f80] text-lg leading-none">
+            ×
+          </span>
+        </button>
+      </div>
+
+      <%= render "admin/invoice_batches/form", invoice_batch: @invoice_batch %>
+    </div>
+  </div>
+</div>

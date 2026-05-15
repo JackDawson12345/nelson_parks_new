@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "meter_readings" do %>
+  <%= turbo_frame_tag "meter_readings" do %>
+    <%= render "meter_readings", readings: @thisMonthsReadings %>
+  <% end %>
+<% end %>

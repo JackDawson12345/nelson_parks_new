@@ -1,0 +1,21 @@
+<!-- app/views/admin/invoice_batches/_actions.html.erb -->
+
+<div
+  id="invoice_batch_actions_<%= invoice_batch.id %>"
+  class="flex justify-end pt-4 gap-4"
+>
+  <button
+    type="button"
+    data-action="click->modal#close"
+    class="rounded border px-4 py-2 text-sm hover:bg-[#f8f8f8]"
+  >
+    Close
+  </button>
+
+  <% if ["Draft", "Failed"].include?(invoice_batch.status) %>
+    <%= button_to "Create Invoices",
+                  create_invoices_admin_invoice_batch_path(invoice_batch),
+                  method: :post,
+                  class: "rounded px-4 py-2 text-sm bg-[#ffb400] text-[#181818] hover:bg-[#ffc029]" %>
+  <% end %>
+</div>

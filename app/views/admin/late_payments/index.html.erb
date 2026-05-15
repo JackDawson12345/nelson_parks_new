@@ -1,0 +1,32 @@
+<div data-controller="modal">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-[#17261f]">
+        Late Payments
+      </h1>
+
+      <p class="text-sm/[20px] text-[#17261f80]">
+        Track late payments by park and year
+      </p>
+    </div>
+
+    <button
+      type="button"
+      data-action="click->modal#open"
+      data-modal-id="late-payment-modal"
+      class="bg-[#ffb400] py-2 px-4 rounded flex gap-2 items-center hover:bg-[#ffc029] transition"
+    >
+      <%= render 'icons/plus', size: '16px', colour: '#181818' %>
+
+      <p class="text-[#181818] text-sm font-medium">
+        Add Late Payment
+      </p>
+    </button>
+  </div>
+
+  <%= render "form", late_payment: @late_payment %>
+
+  <%= turbo_frame_tag "late_payments" do %>
+    <%= render "late_payments", late_payments: @late_payments %>
+  <% end %>
+</div>

@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "pitch_fees" do %>
+  <%= turbo_frame_tag "pitch_fees" do %>
+    <%= render "pitch_fees", pitch_fees: @pitch_fees %>
+  <% end %>
+<% end %>

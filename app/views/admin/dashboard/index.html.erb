@@ -1,0 +1,117 @@
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold text-[#17261f]">Dashboard</h1>
+  <p class="text-sm/[20px] text-[#17261f80]">Overview of Nelson Parks operations</p>
+</div>
+
+<div class="flex gap-4 mb-6">
+  <div class="w-1/4 bg-white shadow-sm p-5 flex flex-col gap-4 border rounded-lg hover:border-[#ffb400] transition transition-500 ease-in-out">
+    <div class="flex justify-between">
+      <div class="w-10 h-10 flex justify-center items-center bg-[#ffb40020] rounded">
+        <%= render 'icons/parks', size: '20px', colour: '#ffb400' %>
+      </div>
+      <div>
+        <%= link_to admin_parks_path do %>
+          <%= render 'icons/arrow', size: '16px', colour: '#63746b' %>
+        <% end %>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold text-2xl/[32px] text-[#17261f]"><%= @parks.count %></h3>
+      <p class="text-xs mt-1 text-[#17261f80]">Total Parks</p>
+      <p class="text-[11px]/[16px] mt-1 text-[#173025]">+1 this quarter</p>
+    </div>
+  </div>
+  <div class="w-1/4 bg-white shadow-sm p-5 flex flex-col gap-4 border rounded-lg hover:border-[#ffb400] transition transition-500 ease-in-out">
+    <div class="flex justify-between">
+      <div class="w-10 h-10 flex justify-center items-center bg-[#ffb40020] rounded">
+        <%= render 'icons/pitches', size: '20px', colour: '#ffb400' %>
+      </div>
+      <div>
+        <%= render 'icons/arrow', size: '16px', colour: '#63746b' %>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold text-2xl/[32px] text-[#17261f]"><%= @pitches.count %></h3>
+      <p class="text-xs mt-1 text-[#17261f80]">Active Pitches</p>
+      <p class="text-[11px]/[16px] mt-1 text-[#173025]"><%= @pitches.where(status: 'Vacant').count %> vacant</p>
+    </div>
+  </div>
+  <div class="w-1/4 bg-white shadow-sm p-5 flex flex-col gap-4 border rounded-lg hover:border-[#ffb400] transition transition-500 ease-in-out">
+    <div class="flex justify-between">
+      <div class="w-10 h-10 flex justify-center items-center bg-[#ffb40020] rounded">
+        <%= render 'icons/clients', size: '20px', colour: '#ffb400' %>
+      </div>
+      <div>
+        <%= render 'icons/arrow', size: '16px', colour: '#63746b' %>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold text-2xl/[32px] text-[#17261f]"><%= @clients.count %></h3>
+      <p class="text-xs mt-1 text-[#17261f80]">Clients</p>
+      <p class="text-[11px]/[16px] mt-1 text-[#173025]">+0 this month</p>
+    </div>
+  </div>
+  <div class="w-1/4 bg-white shadow-sm p-5 flex flex-col gap-4 border rounded-lg hover:border-[#ffb400] transition transition-500 ease-in-out">
+    <div class="flex justify-between">
+      <div class="w-10 h-10 flex justify-center items-center bg-[#ffb40020] rounded">
+        <%= render 'icons/pitchfees', size: '20px', colour: '#ffb400' %>
+      </div>
+      <div>
+        <%= render 'icons/arrow', size: '16px', colour: '#63746b' %>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold text-2xl/[32px] text-[#17261f]">£735.70</h3>
+      <p class="text-xs mt-1 text-[#17261f80]">Outstanding</p>
+      <p class="text-[11px]/[16px] mt-1 text-[#173025]">Across 3 accounts</p>
+    </div>
+  </div>
+</div>
+
+<div class="flex gap-4">
+  <div class="w-3/4 bg-white shadow-sm flex flex-col gap-4 border rounded-lg transition transition-500 ease-in-out">
+    <div class="p-6 flex justify-between items-center">
+      <p>Recent Invoice Batches</p>
+      <%= render 'icons/chart', size: '16px', colour: '#63746b' %>
+    </div>
+    <div class="pb-6 px-6 space-y-3">
+      <% @invoice_batches.each do |invoice_batch| %>
+        <div class="bg-[#f8faf9] rounded p-3 flex justify-between hover:bg-[#ffb40010] transition transition-500 ease-in-out">
+          <div>
+            <h6 class="text-sm/[20px] font-medium text-[#17261f]"><%= invoice_batch.reference %></h6>
+            <p class="text-xs/[16px] text-[#17261f80]"><%= invoice_batch.created_at.strftime("%d-%m-%Y") %> • <%= (invoice_batch.reading || []).count %> clients</p>
+          </div>
+          <div>
+            <% if invoice_batch.utility == 'Gas' or invoice_batch.utility == 'Electrice' %>
+              <h6 class="text-sm/[20px] font-medium text-[#17261f] text-right">£<%= invoice_batch.reading.sum { |reading| reading["total"].to_d }.to_f %></h6>
+            <% elsif invoice_batch.utility == 'Pitch Fees' or invoice_batch.utility == 'Utilities' or invoice_batch.utility == 'Lodge Payments' or invoice_batch.utility == 'Late Payments' %>
+              <h6 class="text-sm/[20px] font-medium text-[#17261f] text-right">£<%= invoice_batch.reading.sum { |reading| reading["total"].to_d }.to_f %></h6>
+            <% end %>
+            <p class="text-xs/[16px] text-[#17261f80] text-right" ><%= invoice_batch.status %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="w-1/4 bg-white shadow-sm flex flex-col gap-4 border rounded-lg transition transition-500 ease-in-out">
+    <div class="p-6 flex justify-between items-center">
+      <p>Park Snapshots</p>
+    </div>
+    <div class="pb-6 px-6 space-y-3">
+      <% @parks.each do |park| %>
+        <div class="flex justify-between">
+          <div>
+            <h6 class="text-sm/[20px] font-medium text-[#17261f]"><%= park.name %></h6>
+            <p class="text-xs/[16px] text-[#17261f80]" ><%= park.location %></p>
+          </div>
+          <div class="flex justify-end items-center">
+            <% pitches = Pitch.where(park_id: park.id) %>
+            <p class="text-xs/[16px] text-[#173025] text-right" ><%= pitches.count %> Pitches</p>
+          </div>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

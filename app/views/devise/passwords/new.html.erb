@@ -1,0 +1,25 @@
+<div class="min-h-[100vh] min-w-[100vw] flex flex-col justify-center items-center bg-[#f9fafb]">
+  <div class="bg-white border rounded p-6 max-w-sm w-full">
+    <div class="mb-4">
+      <h2 class="text-lg/[28px] font-semibold text-[#173025]">Nelson Parks</h2>
+      <p class="text-xs/[20px] text-[#17261f80]">Forgot your password?</p>
+    </div>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="field mb-4">
+        <p class="text-sm/[14px] font-semibold mb-2"><%= f.label :email %></p>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'border rounded h-10 w-full bg-[#f9fafb]' %>
+      </div>
+
+      <div class="actions mb-2">
+        <%= f.submit "Send me password reset instructions", class: 'h-10 bg-[#173025] w-full text-sm font-semibold text-white rounded' %>
+      </div>
+    <% end %>
+
+    <p class="text-center text-sm"><%= link_to "Log in", new_session_path(resource_name) %></p>
+
+  </div>
+
+</div>

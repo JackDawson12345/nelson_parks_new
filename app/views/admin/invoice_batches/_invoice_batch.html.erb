@@ -1,0 +1,59 @@
+<!-- app/views/admin/invoice_batches/_invoice_batch.html.erb -->
+<tr id="<%= dom_id(invoice_batch) %>">
+  <td class="px-4 py-3 text-sm text-gray-700">
+    <div class="flex gap-2 items-center">
+      <div>
+        <%= render "icons/invoices", size: "16px", colour: "#63746b" %>
+      </div>
+
+      <p class="font-medium">
+        <%= invoice_batch.reference %>
+      </p>
+    </div>
+  </td>
+
+  <td class="px-4 py-3 text-sm text-gray-700">
+    <%= invoice_batch.created_at.strftime("%d-%m-%Y") %>
+  </td>
+
+  <td class="px-4 py-3 text-sm text-gray-700">
+    <%= (invoice_batch.reading || []).count %>
+  </td>
+
+  <td class="px-4 py-3 text-sm">
+    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-gray-100">
+      <%= invoice_batch.status %>
+    </span>
+  </td>
+
+  <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+    <% if ["Gas", "Electric"].include?(invoice_batch.utility) %>
+      £<%= invoice_batch.reading.sum { |reading| reading["total_price"].to_d }.to_f %>
+    <% elsif ["Pitch Fees", "Utilities", "Lodge Payments", "Late Payments"].include?(invoice_batch.utility) %>
+      £<%= invoice_batch.reading.sum { |reading| reading["total"].to_d }.to_f %>
+    <% end %>
+  </td>
+
+  <td class="px-4 py-3 text-sm">
+    <div class="flex justify-end items-center gap-3">
+      <button
+        type="button"
+        data-action="click->modal#open"
+        data-modal-id="view-invoice-batch-<%= invoice_batch.id %>"
+        class="flex justify-center items-center rounded hover:bg-[#f5f5f5] gap-2 px-2 py-1"
+      >
+        <%= render "icons/eye", size: "16px", colour: "#63746b" %>
+        <p>View</p>
+      </button>
+
+      <button
+        type="button"
+        data-action="click->modal#open"
+        data-modal-id="delete-invoice-batch-<%= invoice_batch.id %>"
+        class="w-8 h-8 flex justify-center items-center rounded hover:bg-[#fef2f2]"
+      >
+        <%= render "icons/bin", size: "16px", colour: "#db2424" %>
+      </button>
+    </div>
+  </td>
+</tr>

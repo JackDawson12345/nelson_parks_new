@@ -1,0 +1,123 @@
+<%= form_with model: invoice_batch,
+              url: invoice_batch.persisted? ? admin_invoice_batch_path(invoice_batch) : admin_invoice_batches_path,
+              class: "space-y-4",
+              data: { controller: "invoice-batch" } do |form| %>
+
+  <% if invoice_batch.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h3 class="text-sm font-semibold text-red-700 mb-2">
+        Please fix the following:
+      </h3>
+
+      <ul class="text-sm text-red-600 list-disc pl-5 space-y-1">
+        <% invoice_batch.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="flex gap-3">
+    <div class="w-1/2">
+      <%= form.label :park_id, "Park", class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.collection_select :park_id,
+                                 Park.all.order(:name),
+                                 :id,
+                                 :name,
+                                 { prompt: "Select a park" },
+                                 {
+                                   required: true,
+                                   class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                                   data: {
+                                     invoice_batch_target: "park",
+                                     action: "change->invoice-batch#toggleUtilityOptions"
+                                   }
+                                 } %>
+    </div>
+
+    <div class="w-1/2">
+      <%= form.label :utility, "Utility", class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.select :utility,
+                      options_for_select([
+                                           ["Gas", "Gas"],
+                                           ["Electric", "Electric"],
+                                           ["Pitch Fees", "Pitch Fees"],
+                                           ["Utilities", "Utilities"],
+                                           ["Late Payments", "Late Payments"],
+                                           ["Lodge Payments", "Lodge Payments"]
+                                         ], invoice_batch.utility),
+                      { prompt: "Select a utility" },
+                      {
+                        required: true,
+                        class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                        data: {
+                          invoice_batch_target: "utility"
+                        }
+                      } %>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <div class="w-1/2">
+      <%= form.label :start_date, class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.date_field :start_date,
+                          value: invoice_batch.start_date || Time.zone.today.beginning_of_month,
+                          required: true,
+                          class: "mt-1 w-full rounded border px-3 py-2 text-sm" %>
+    </div>
+
+    <div class="w-1/2">
+      <%= form.label :end_date, class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.date_field :end_date,
+                          value: invoice_batch.end_date || Time.zone.today.end_of_month,
+                          required: true,
+                          class: "mt-1 w-full rounded border px-3 py-2 text-sm" %>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <div class="w-1/2">
+      <%= form.label :invoice_date, class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.date_field :invoice_date,
+                          value: invoice_batch.invoice_date || Time.zone.today,
+                          required: true,
+                          class: "mt-1 w-full rounded border px-3 py-2 text-sm" %>
+    </div>
+
+    <div class="w-1/2">
+      <%= form.label :due_date, class: "block text-sm font-medium text-[#17261f]" %>
+
+      <%= form.date_field :due_date,
+                          value: invoice_batch.due_date || Time.zone.today.next_month.beginning_of_month,
+                          required: true,
+                          class: "mt-1 w-full rounded border px-3 py-2 text-sm" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :notes, class: "block text-sm font-medium text-[#17261f]" %>
+
+    <%= form.text_area :notes,
+                       rows: 4,
+                       class: "mt-1 w-full rounded border px-3 py-2 text-sm",
+                       placeholder: "Optional notes for this invoice batch" %>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-4">
+    <button
+      type="button"
+      data-action="click->modal#close"
+      class="rounded border px-4 py-2 text-sm hover:bg-[#f8f8f8]"
+    >
+      Cancel
+    </button>
+
+    <%= form.submit invoice_batch.persisted? ? "Update Batch" : "Create Batch",
+                    class: "bg-[#ffb400] text-[#181818] py-2 px-4 rounded text-sm font-medium hover:bg-[#ffc029]" %>
+  </div>
+<% end %>

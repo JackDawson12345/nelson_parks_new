@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pitch: one
+  park: one
+  user: one
+  year: 1
+  frequency: MyString
+  vat: 9.99
+  net_total: 9.99
+  vat_total: 9.99
+  total: 9.99
+
+two:
+  pitch: two
+  park: two
+  user: two
+  year: 1
+  frequency: MyString
+  vat: 9.99
+  net_total: 9.99
+  vat_total: 9.99
+  total: 9.99
